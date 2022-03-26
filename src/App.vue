@@ -1,28 +1,26 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <ShopHeader></ShopHeader>
+    <router-view></router-view>
+    <ShopFooter v-show="$route.meta.show"></ShopFooter>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import ShopHeader from '@/components/Header'
+import ShopFooter from '@/components/Footer'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    ShopHeader,
+    ShopFooter
+  },
+  mounted() {
+    // 放在根组件中可以保证只发送一次请求，将数据存于仓库中
+    // state:他是咱们大仓库中的state（包含home|search）
+    this.$store.dispatch('categoryList')
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<style></style>
