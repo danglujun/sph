@@ -9,3 +9,11 @@ export const reqCategoryList = () => requests.get('/product/getBaseCategoryList'
 export const reqBannerList = () => mockRequest.get('/banner')
 
 export const reqFloorList = () => mockRequest.get('/floor')
+
+// 获取搜索模块的数据，给服务器传递一个默认参数（至少是一个空对象）
+export const reqSearchInfo = params =>
+  requests({
+    url: '/list',
+    method: 'POST',
+    data: params
+  })

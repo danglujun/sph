@@ -108,7 +108,7 @@ export default {
       if (categoryname) {
         // 整理路由跳转的参数
         let location = { name: 'search' }
-        let query = { cagegoryName: categoryname }
+        let query = { categoryName: categoryname }
         if (category1id) {
           query.category1Id = category1id
         } else if (category2id) {
