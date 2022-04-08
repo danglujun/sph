@@ -5,7 +5,7 @@
     <ShopRecommend></ShopRecommend>
     <ShopRank></ShopRank>
     <ShopLike></ShopLike>
-    <ShopFloor v-for="floor in floorList" :key="floor.id" :floor='floor'></ShopFloor>
+    <ShopFloor v-for="floor in floorList" :key="floor.id" :floor="floor"></ShopFloor>
     <ShopBrand></ShopBrand>
   </div>
 </template>

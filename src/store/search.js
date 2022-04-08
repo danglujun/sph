@@ -7,7 +7,7 @@ const state = {
 const actions = {
   async getSearchInfo({ commit }, params = {}) {
     let res = await reqSearchInfo(params)
-    if (res.code === 200) {
+    if (res.code == 200) {
       commit('GETSEARCHINFO', res.data)
     }
   }

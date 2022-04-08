@@ -3,10 +3,8 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-import ShopHome from '@/pages/Home'
-import ShopLogin from '@/pages/Login'
-import ShopRegister from '@/pages/Register'
-import ShopSearch from '@/pages/Search'
+import routes from './routes'
+import store from '@/store'
 
 // 先把VueRouter原型对象上的push保存一份
 let originPush = VueRouter.prototype.push
@@ -41,32 +39,56 @@ VueRouter.prototype.replace = function (location, resolve, reject) {
   }
 }
 
-export default new VueRouter({
-  routes: [
-    {
-      path: '*',
-      redirect: '/home'
-    },
-    {
-      path: '/home',
-      component: ShopHome,
-      meta: { show: true }
-    },
-    {
-      path: '/login',
-      component: ShopLogin,
-      meta: { show: false }
-    },
-    {
-      path: '/register',
-      component: ShopRegister,
-      meta: { show: false }
-    },
-    {
-      path: '/search/:keyword?',
-      component: ShopSearch,
-      meta: { show: true },
-      name: 'search'
-    }
-  ]
+let router = new VueRouter({
+  routes,
+  // 滚动行为
+  scrollBehavior() {
+    // 返回的这个y=0，代表跳转后的新页面滚动条在最顶部
+    return { y: 0 }
+  }
 })
+
+// 全局守卫
+router.beforeEach(async (to, _, next) => {
+  next()
+  // 用户登录了才会有token，未登录一定不会有token
+  let token = store.state.user.token
+  let name = store.state.user.userInfo.name
+  // 用户已经登录了
+  if (token) {
+    // 如果用户已经登录了，禁止去登录页面
+    if (to.path == '/login') {
+      next('/')
+    } else {
+      // 登录了，但去的不是login
+      // 如果用户名已有
+      if (name) {
+        next()
+      } else {
+        // 没有用户信息，派发action让仓库存储用户信息再跳转
+        try {
+          // 获取用户信息成功后放行
+          await store.dispatch('getUserInfo')
+          next()
+        } catch (error) {
+          // token失效了获取不到用户信息，先清除过期token,再重新登录
+          await store.dispatch('logout')
+          next('/login')
+        }
+      }
+    }
+  } else {
+    // 未登录：不能去交易相关、支付相关（pay|paysuccess）、个人中心
+    // 未登录去上面这些路由--登录
+    let toPath = to.path
+    if (toPath.indexOf('/trade') != -1 || toPath.indexOf('/pay') != -1 || toPath.indexOf('/center') != -1) {
+      // 把未登录的时候想去而没有去成的信息，存储与地址栏中（路由）
+      next('/login?redirect=' + toPath)
+    } else {
+      // 去的不是上面的这些路由（home|search|detail）--放行
+      next()
+    }
+  }
+})
+
+export default router
